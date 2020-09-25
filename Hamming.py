@@ -1,111 +1,99 @@
+from random import randint
+import helpers
 import numpy as np
-import random
 import math
 
 G4 = [[1, 1, 0, 1],
-     [1, 0, 1, 1],
-     [1, 0, 0, 0],
-     [0, 1, 1, 1],
-     [0, 1, 0, 0],
-     [0, 0, 1, 0],
-     [0, 0, 0, 1]]
+      [1, 0, 1, 1],
+      [1, 0, 0, 0],
+      [0, 1, 1, 1],
+      [0, 1, 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1]]
+  
 G11 = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [1, 1, 0, 0, 0, 0, 0, 0,	0, 0, 0],
-       [0, 1, 1, 0, 0, 0, 0, 0,	0, 0, 0],
-       [0, 0, 1, 1, 0, 0, 0, 0,	0, 0, 0],
-       [1, 0, 0, 1, 1, 0, 0, 0,	0, 0, 0],
-       [0, 1, 0, 0, 1, 1, 0, 0,	0, 0, 0],
-       [0, 0, 1, 0, 0, 1, 1, 0,	0, 0, 0],
-       [0, 0, 0, 1, 0, 0, 1, 1,	0, 0, 0],
-       [0, 0, 0, 0, 1, 0, 0, 1,	1, 0, 0],
-       [0, 0, 0, 0, 0, 1, 0, 0,	1, 1, 0],
-       [0, 0, 0, 0, 0, 0, 1, 0,	0, 1, 1],
-       [0, 0, 0, 0, 0, 0, 0, 1,	0, 0, 1],
-       [0, 0, 0, 0, 0, 0, 0, 0,	1, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0,	0, 1, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0,	0, 0, 1]]
+       [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+       [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+       [0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+       [0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0],
+       [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0],
+       [0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+       [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0],
+       [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+       [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]];
 
 H4 = [[1, 0, 1, 0, 1, 0, 1],
       [0, 1, 1, 0, 0, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1]]
-
+      [0, 0, 0, 1, 1, 1, 1]];
+  
 H11 = [[1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
        [0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
        [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
-       [0, 0, 0, 0, 0, 0 ,0, 0, 1, 1, 1, 1, 1, 1, 1]]
-
+       [0, 0, 0, 0, 0, 0 ,0, 0, 1, 1, 1, 1, 1, 1, 1]];
+  
 R4 = [[0, 0, 1, 0, 0, 0, 0],
       [0, 0, 0, 0, 1, 0, 0],
       [0, 0, 0, 0, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 1]]
-
+      [0, 0, 0, 0, 0, 0, 1]];
+  
 R11 = [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 ,0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ]]
+       [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 ,0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]];
 
-mode = list(input("Enter mode: "))
+mode = input("Enter mode: ")
 
-if len(mode) == 3:
-    total_bits = int(mode[1])
-    num_data_bits = int(mode[2])
-else:
-    total_bits = int(mode[1] + mode[2])
-    num_data_bits = int(mode[3] + mode[4])
+if mode == 'H74':
+    total_bits = 7
+    num_data_bits = 4
+elif mode == 'H1511':
+    total_bits = 15
+    num_data_bits = 11
 
-def generate_random_message(num_data_bits):
-    message = []
-    for i in range(num_data_bits):
-        temp = random.randint(0, 1)
-        message.append(temp)
-    return message
+message = np.array(helpers.generate_random_message(num_data_bits))
 
-message = generate_random_message(num_data_bits)
-print("Message           :",message)
-
+print("Message          :",message)
 if total_bits == 7:
     x = np.matmul(G4, message) % 2
 elif total_bits == 15:
     x = np.matmul(G11, message) % 2
 
-print("Send vector       :",x)
-
-def generate_error(x, total_bits):
-    loc = random.randint(1, total_bits);
-    flip_bit(x, loc)
-    return
-
-def flip_bit(x, loc):
-    x[loc - 1] = 1 - x[loc - 1]
-    return
+print("Send Vector      :",x)
 
 #Create error
-generate_error(x, total_bits)
+helpers.generate_error(x, total_bits)
 
 if total_bits == 7:
     z = np.matmul(H4, x) % 2
 else:
     z = np.matmul(H11, x) % 2
 
-print("Received message  :",x)
-print("Parity Check      :",z)
+print("Received Message :",x)
+print("Parity Check     :",z)
+
+z = z[::-1]
 
 if sum(z) == 0:
-    print("Decoded message   :",message)
+    print("Decoded Message  :",np.matmul(R4, x))
 else:
     error_location = int("".join([str(a) for a in z]), 2)
-    flip_bit(x, error_location)
-    print("Corrected message :",x)
+    helpers.flip_bit(x, error_location)
+    print("Corrected Message:",x)
     if total_bits == 7:
         decode = np.matmul(R4, x)
     else:
         decode = np.matmul(R11, x)
-    print("Decoded message   :",decode)
+    print("Decoded Message  :",decode)
 

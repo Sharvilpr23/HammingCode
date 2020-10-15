@@ -3,6 +3,9 @@ import helper
 import numpy as np
 import math
 
+'''
+    Generator Matrix for Hamming(7, 4)
+'''
 G4 = [[1, 1, 0, 1],
       [1, 0, 1, 1],
       [1, 0, 0, 0],
@@ -11,6 +14,9 @@ G4 = [[1, 1, 0, 1],
       [0, 0, 1, 0],
       [0, 0, 0, 1]]
 
+'''
+    Generator Matrix for Hamming(15, 11)
+'''
 G11 = [[1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
        [1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,20 +33,32 @@ G11 = [[1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
 
+'''
+    Parity Generator Matrix for Hamming(7, 4)
+'''
 H4 = [[1, 0, 1, 0, 1, 0, 1],
       [0, 1, 1, 0, 0, 1, 1],
       [0, 0, 0, 1, 1, 1, 1]]
 
+'''
+    Parity Generator Matrix for Hamming(15, 11)
+'''
 H11 = [[1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
        [0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
        [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
        [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]]
 
+'''
+    Decoder Matrix for Hamming(7, 4)
+'''
 R4 = [[0, 0, 1, 0, 0, 0, 0],
       [0, 0, 0, 0, 1, 0, 0],
       [0, 0, 0, 0, 0, 1, 0],
       [0, 0, 0, 0, 0, 0, 1]]
 
+'''
+    Decoder Matrix for Hamming(15, 11)
+'''
 R11 = [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -92,7 +110,7 @@ def HammingCodeDriver():
     Step 2: Convert the list into a decimal integer (As used in the main script)
     Step 3: Check for successful conversion
 """
-def ConvertSyndromeVectorToDecimal():
+def ConvertSyndromeVectorToDecimal(print_results):
     flag = True
     for i in range(0, 16):
         if flag:
@@ -105,7 +123,8 @@ def ConvertSyndromeVectorToDecimal():
             if not flag:
                 print("Test ", i, " Failed")
                 break
-    if flag:
+            print("Test ", i, ": SUCCESS")
+    if flag and print_results:
         print("Converting Syndrome Vector to Decimal: SUCCESS")
 
 """
@@ -120,16 +139,16 @@ def ConvertSyndromeVectorToDecimal():
     Step 3: Generate a parity check matrix (Sum(z) should always be 0)
     Step 4: Decode the original message using a decoder matrix 
 """
-def Hamming74NoError(debug):
+def Hamming74NoError(print_results):
     flag = True
     for i in range(0, 16):
         flag = True
-        if debug: print("Num: ",i)
+        if print_results: print("Num: ",i)
         message = np.array([int(a) for a in list(bin(i)[2:].zfill(4))])
         x = helper.encodeMessage(G4, message)
-        if debug: print("Message: ",message)
+        if print_results: print("Message: ",message)
         z = helper.generateParityCheckMatrix(H4, x)[::-1]
-        if debug: print("Parity: ", z)
+        if print_results: print("Parity: ", z)
         if sum(z) == 0:
             if message.all() != helper.decodeMessage(R4, x).all():
                 flag = False
@@ -149,22 +168,22 @@ def Hamming74NoError(debug):
     Step 5: Correct the error 
     Step 5: Decode the original message using a decoder matrix 
 """
-def Hamming74WithError(debug):
+def Hamming74WithError(print_results):
     flag = True
     for i in range(0, 16):
         for error_location in range(0,7):
             flag = True
-            if debug: print("Num: ",i, "Error location: ", error_location)
+            if print_results: print("Num: ",i, "Error location: ", error_location)
             message = np.array([int(a) for a in list(bin(i)[2:].zfill(4))])
-            if debug: print("Message: ",message)
+            if print_results: print("Message: ",message)
             x = helper.encodeMessage(G4, message)
-            if debug: print("Syndrome: ", x)
+            if print_results: print("Syndrome: ", x)
             helper.flip_bit(x, error_location)
-            if debug: print("Syndrome we: ", x)
+            if print_results: print("Syndrome we: ", x)
             z = helper.generateParityCheckMatrix(H4, x)[::-1]
-            if debug: print("Parity: ", z)
+            if print_results: print("Parity: ", z)
             x = helper.errorCorrection(x, z)
-            if debug: print("Fixed Syndrome: ", x)
+            if print_results: print("Fixed Syndrome: ", x)
             if sum(z) == 0:
                 if message.all() != helper.decodeMessage(R4, x).all():
                     flag = False
@@ -186,16 +205,16 @@ def Hamming74WithError(debug):
     Step 3: Generate a parity check matrix (Sum(z) should always be 0)
     Step 4: Decode the original message using a decoder matrix 
 """
-def Hamming1511NoError(debug):
+def Hamming1511NoError(print_results):
     flag = True
     for i in range(0, 2048):
         flag = True
-        if debug: print("Num: ",i)
+        if print_results: print("Num: ",i)
         message = np.array([int(a) for a in list(bin(i)[2:].zfill(11))])
         x = helper.encodeMessage(G11, message)
-        if debug: print("Message: ",message)
+        if print_results: print("Message: ",message)
         z = helper.generateParityCheckMatrix(H11, x)[::-1]
-        if debug: print("Parity: ", z)
+        if print_results: print("Parity: ", z)
         if sum(z) == 0:
             if message.all() != helper.decodeMessage(R11, x).all():
                 flag = False
@@ -215,22 +234,22 @@ def Hamming1511NoError(debug):
     Step 5: Correct the error 
     Step 5: Decode the original message using a decoder matrix 
 """
-def Hamming1511WithError(debug):
+def Hamming1511WithError(print_results):
     flag = True
-    for i in range(0, 16):
+    for i in range(0, 2048):
         for error_location in range(0,15):
             flag = True
-            if debug: print("Num: ",i, "Error location: ", error_location)
+            if print_results: print("Num: ",i, "Error location: ", error_location)
             message = np.array([int(a) for a in list(bin(i)[2:].zfill(11))])
-            if debug: print("Message: ",message)
+            if print_results: print("Message: ",message)
             x = helper.encodeMessage(G11, message)
-            if debug: print("Syndrome: ", x)
+            if print_results: print("Syndrome: ", x)
             helper.flip_bit(x, error_location)
-            if debug: print("Syndrome we: ", x)
+            if print_results: print("Syndrome we: ", x)
             z = helper.generateParityCheckMatrix(H11, x)[::-1]
-            if debug: print("Parity: ", z)
+            if print_results: print("Parity: ", z)
             x = helper.errorCorrection(x, z)
-            if debug: print("Fixed Syndrome: ", x)
+            if print_results: print("Fixed Syndrome: ", x)
             if sum(z) == 0:
                 if message.all() != helper.decodeMessage(R11, x).all():
                     flag = False
@@ -241,15 +260,20 @@ def Hamming1511WithError(debug):
         print("Hamming(15, 11) with Errors: SUCCESS")
 
 def runTests():
-    debug = False
-    mode = input("Do you want to run the tests in debug mode? [Y/N]")
+    print_results = False
+    mode = input("Do you want to print the results? [Y/N]")
     if mode == 'Y' or mode == 'y':
-        debug = True
-    ConvertSyndromeVectorToDecimal()
-    Hamming74NoError(debug)
-    Hamming74WithError(debug)
-    Hamming1511NoError(debug)
-    Hamming1511WithError(debug)
+        print_results = True
+    flag = input("Do you want to run tests for ConvertSyndromeVectorToDecimal function? [Y/N] ")
+    if flag == 'Y' or flag == 'y': ConvertSyndromeVectorToDecimal(print_results)
+    flag = input("Do you want to run tests for Hamming74NoError function? [Y/N] ")
+    if flag == 'Y' or flag == 'y': Hamming74NoError(print_results)
+    flag = input("Do you want to run tests for Hamming74WithError function? [Y/N] ")
+    if flag == 'Y' or flag == 'y': Hamming74WithError(print_results)
+    flag = input("Do you want to run tests for Hamming1511NoError function? [Y/N] ")
+    if flag == 'Y' or flag == 'y': Hamming1511NoError(print_results)
+    flag = input("Do you want to run tests for Hamming1511WithError function? [Y/N] ")
+    if flag == 'Y' or flag == 'y': Hamming1511WithError(print_results)
 
 """
     End of Testing Functions
@@ -258,10 +282,10 @@ def runTests():
 def main():
 
     # For testing, uncomment the following line
-    #runTests()
+    runTests()
 
     # For running the script in normal mode, uncomment the following line
-    HammingCodeDriver()
+    #HammingCodeDriver()
 
 if __name__ == "__main__":
     main()
